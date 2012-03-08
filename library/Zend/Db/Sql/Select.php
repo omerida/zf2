@@ -59,9 +59,9 @@ class Select implements SqlInterface, PreparableSqlInterface
 
     /**
      * Constructor
-     * 
-     * @param  null|string $table 
-     * @param  null|string $databaseOrSchema 
+     *
+     * @param  null|string $table
+     * @param  null|string $databaseOrSchema
      * @return void
      */
     public function __construct($table = null, $databaseOrSchema = null)
@@ -74,9 +74,9 @@ class Select implements SqlInterface, PreparableSqlInterface
 
     /**
      * Create from clause
-     * 
-     * @param  string $table 
-     * @param  null|string $databaseOrSchema 
+     *
+     * @param  string $table
+     * @param  null|string $databaseOrSchema
      * @return Select
      */
     public function from($table, $databaseOrSchema = null)
@@ -88,14 +88,26 @@ class Select implements SqlInterface, PreparableSqlInterface
 
     /**
      * Specify columns from which to select
-     * 
-     * @param  array $columns 
+     *
+     * @param  array $columns
      * @return Select
      */
     public function columns(array $columns)
     {
         $this->columns = $columns;
         return $this;
+    }
+
+    public function order($order)
+    {
+        $this->order = $order;
+    }
+
+    public function limit($count, $offset = 0)
+    {
+        $this->limit->count = (int) $count;
+        $this->limit->offset = (int) $offset;
+
     }
 
     /*
@@ -109,10 +121,10 @@ class Select implements SqlInterface, PreparableSqlInterface
 
     /**
      * Create join clause
-     * 
-     * @param  string $name 
-     * @param  string $on 
-     * @param  string|array $columns 
+     *
+     * @param  string $name
+     * @param  string $on
+     * @param  string|array $columns
      * @param  string $type one of the JOIN_* constants
      * @return Select
      */
@@ -127,8 +139,8 @@ class Select implements SqlInterface, PreparableSqlInterface
 
     /**
      * Create where clause
-     * 
-     * @param  Where|\Closure|string|array $predicate 
+     *
+     * @param  Where|\Closure|string|array $predicate
      * @param  string $combination One of the OP_* constants from Predicate\PredicateSet
      * @return Select
      */
@@ -219,18 +231,21 @@ class Select implements SqlInterface, PreparableSqlInterface
             $sql = $statement->getSql();
         }
 
-        $order = null; // @todo
-        $limit = null; // @todo
+        $order = $this->order; // @todo
+        $limit = $this->limit; // @todo
 
-        $sql .= (isset($order)) ? sprintf($this->specification3, $order) : '';
-        $sql .= (isset($limit)) ? sprintf($this->specification4, $limit) : '';
+        $sql .= (isset($order)) ? ' ' . sprintf($this->specification3, $order) : '';
+
+        // OAM mysql limit spec
+        $spec = ' LIMIT %d, %d';
+        $sql .= (isset($this->limit)) ? sprintf($spec, $this->limit->offset, $this->limit->count) : '';
 
         $statement->setSql($sql);
     }
 
     /**
      * Get SQL string for statement
-     * 
+     *
      * @param  null|PlatformInterface $platform If null, defaults to Sql92
      * @return string
      */
@@ -290,8 +305,11 @@ class Select implements SqlInterface, PreparableSqlInterface
         }
 
         // process order & limit (@todo this is too basic, but good for now)
-        $sql .= (isset($this->order)) ? sprintf($this->specification3, $this->order) : '';
-        $sql .= (isset($this->limit)) ? sprintf($this->specification3, $this->limit) : '';
+        $sql .= (isset($this->order)) ? ' ' . sprintf($this->specification3, $this->order) : '';
+
+        // OAM mysql limit spec
+        $spec = ' LIMIT %d, %d';
+        $sql .= (isset($this->limit)) ? sprintf($spec, $this->limit->offset, $this->limit->count) : '';
         return $sql;
     }
 
@@ -299,8 +317,8 @@ class Select implements SqlInterface, PreparableSqlInterface
      * Variable overloading
      *
      * Proxies to "where" only
-     * 
-     * @param  string $name 
+     *
+     * @param  string $name
      * @return mixed
      */
     public function __get($name)

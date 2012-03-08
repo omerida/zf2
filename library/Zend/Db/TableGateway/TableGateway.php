@@ -91,11 +91,11 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Constructor
-     * 
+     *
      * @param string $tableName
      * @param Adapter $adapter
      * @param string $databaseSchema
-     * @param ResultSet $selectResultPrototype 
+     * @param ResultSet $selectResultPrototype
      */
     public function __construct($tableName, Adapter $adapter, $databaseSchema = null, ResultSet $selectResultPrototype = null)
     {
@@ -117,8 +117,8 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * Get table name
-     * 
-     * @return string 
+     *
+     * @return string
      */
     public function getTableName()
     {
@@ -126,8 +126,8 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * Get adapter
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function getAdapter()
     {
@@ -136,7 +136,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Get database schema
-     * 
+     *
      * @return null|string
      */
     public function getDatabaseSchema()
@@ -146,7 +146,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Set sql delete
-     * 
+     *
      * @param Delete $sqlDelete
      */
     public function setSqlDelete(Delete $sqlDelete)
@@ -156,7 +156,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Get sql delete
-     * 
+     *
      * @return Delete
      */
     public function getSqlDelete()
@@ -166,7 +166,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Set sql insert
-     * 
+     *
      * @param Insert $sqlInsert
      */
     public function setSqlInsert(Insert $sqlInsert)
@@ -176,7 +176,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Get sql insert
-     * 
+     *
      * @return Insert
      */
     public function getSqlInsert()
@@ -186,7 +186,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Set sql select
-     * 
+     *
      * @param Select $sqlSelect
      */
     public function setSqlSelect(Select $sqlSelect)
@@ -196,7 +196,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Get sql select
-     * 
+     *
      * @return Select
      */
     public function getSqlSelect()
@@ -206,7 +206,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Set sql update
-     * 
+     *
      * @param Update $sqlUpdate
      */
     public function setSqlUpdate(Update $sqlUpdate)
@@ -216,7 +216,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Get sql update
-     * 
+     *
      * @return Update
      */
     public function getSqlUpdate()
@@ -226,7 +226,7 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Set select result prototype
-     * 
+     *
      * @param null $selectResultPrototype
      */
     public function setSelectResultPrototype($selectResultPrototype)
@@ -236,8 +236,8 @@ class TableGateway implements TableGatewayInterface
 
     /**
      * Get select result prototype
-     * 
-     * @return type 
+     *
+     * @return type
      */
     public function getSelectResultPrototype()
     {
@@ -245,9 +245,9 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * Select
-     * 
+     *
      * @param Closure $where
-     * @return type 
+     * @return type
      */
     public function select($where = null)
     {
@@ -259,19 +259,20 @@ class TableGateway implements TableGatewayInterface
             $select->where($where);
         }
 
+        // create a statement to use
         $statement = $this->adapter->createStatement();
         $select->prepareStatement($this->adapter, $statement);
 
-        $result = $statement->execute();
-        $resultSet = clone $this->selectResultPrototype;
-        $resultSet->setDataSource($result);
+        // instantiate a result set for result-as-object iteration
+        $resultSet = new ResultSet();
+        $resultSet->setDataSource($statement->execute());
         return $resultSet;
     }
     /**
      * Insert
-     * 
+     *
      * @param  type $set
-     * @return type 
+     * @return type
      */
     public function insert($set)
     {
@@ -288,10 +289,10 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * Update
-     * 
+     *
      * @param  type $set
      * @param  string $where
-     * @return type 
+     * @return type
      */
     public function update($set, $where = null)
     {
@@ -308,9 +309,9 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * Delete
-     * 
+     *
      * @param  Closure $where
-     * @return type 
+     * @return type
      */
     public function delete($where)
     {
@@ -330,8 +331,8 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * Get last insert id
-     * 
-     * @return integer 
+     *
+     * @return integer
      */
     public function getLastInsertId()
     {
@@ -339,9 +340,9 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * __get
-     * 
+     *
      * @param  string $name
-     * @return type 
+     * @return type
      */
     public function __get($name)
     {
@@ -375,7 +376,7 @@ class TableGateway implements TableGatewayInterface
     }
     /**
      * __clone
-     * 
+     *
      */
     public function __clone()
     {
