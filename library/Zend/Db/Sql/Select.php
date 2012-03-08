@@ -328,4 +328,15 @@ class Select implements SqlInterface, PreparableSqlInterface
                 return $this->where;
         }
     }
+
+    /**
+     * __clone 
+     *
+     * Resets the where object each time the Select is cloned.
+     * 
+     * @return void
+     */
+    public function __clone() {
+        $this->where = clone $this->where;
+    }
 }
