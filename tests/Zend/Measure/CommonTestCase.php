@@ -13,53 +13,51 @@
  * to license@zend.com so we can send you a copy immediately.
  *
  * @category   Zend
- * @package    Zend_View
- * @subpackage Model
+ * @package    Zend_Measure
+ * @subpackage UnitTests
  * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 
-namespace Zend\View\Model;
+/**
+ * @namespace
+ */
+namespace ZendTest\Measure;
+use Zend\Cache\StorageFactory as CacheFactory,
+    Zend\Cache\Storage\Adapter as CacheAdapter,
+    Zend\Locale\Locale;
 
-use Traversable,
-    Zend\Json\Json,
-    Zend\Stdlib\ArrayUtils;
+/**
+ * PHPUnit test case
+ */
 
 /**
  * @category   Zend
- * @package    Zend_View
- * @subpackage Model
+ * @package    Zend_Measure
+ * @subpackage UnitTests
  * @copyright  Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
+ * @group      Zend_Measure
  */
-class JsonModel extends ViewModel
+abstract class CommonTestCase extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * JSON probably won't need to be captured into a 
-     * a parent container by default.
-     * 
-     * @var string
-     */
-    protected $captureTo = null;
 
     /**
-     * JSON is usually terminal
-     * 
-     * @var bool
+     * The used cache adapter
+     * @var CacheAdapter
      */
-    protected $terminate = true;
+    protected $cache;
 
-    /**
-     * Serialize to JSON
-     * 
-     * @return string
-     */
-    public function serialize()
+    public function setUp()
     {
-        $variables = $this->getVariables();
-        if ($variables instanceof Traversable) {
-            $variables = ArrayUtils::iteratorToArray($variables);
+        $this->cache = CacheFactory::adapterFactory('memory', array('memory_limit' => 0));
+        Locale::setCache($this->cache);
+    }
+
+    public function tearDown()
+    {
+        if ($this->cache) {
+            $this->cache->clear(CacheAdapter::MATCH_ALL);
         }
-        return Json::encode($variables);
     }
 }
